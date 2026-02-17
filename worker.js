@@ -4,7 +4,7 @@ export default {
     const slug = url.pathname.replace("/", "");
 
     // Base submission URL
-    const submissionURL = "https://www.ijbmrs.org/submit-paper";
+    const submissionURL = "https://docs.google.com/forms/d/e/1FAIpQLSfxw2pM90HnukCD9GOV6PZ3r6E5B0XGDAxPfrq3xdqROuSqgg/viewform";
 
     // Root URL message
     if (!slug) {
