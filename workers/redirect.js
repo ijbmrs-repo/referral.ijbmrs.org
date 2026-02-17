@@ -3,13 +3,14 @@ export default {
     const url = new URL(request.url);
     const slug = url.pathname.replace(/^\/+|\/+$/g, "");
 
-    // If no slug, show landing page
+    // Root path → landing page
     if (!slug) {
-      return Response.redirect("https://referral.ijbmrs.org/", 302);
+      return fetch(request);
     }
 
-    // Fetch referral mappings
-    const response = await fetch(env.LINKS_JSON);
+    // Fetch referral mappings (SAFE: no recursion)
+    const origin = new URL(request.url).origin;
+    const response = await fetch(`${origin}/data/links.json`);
     const links = await response.json();
 
     // Invalid or inactive referral
@@ -20,7 +21,7 @@ export default {
       });
     }
 
-    // Create click log
+    // Log click
     const logEntry = {
       referrer_slug: slug,
       referrer_name: links[slug].name,
@@ -28,13 +29,12 @@ export default {
       timestamp: new Date().toISOString()
     };
 
-    // Store log (Cloudflare KV)
     await env.CLICKS.put(
       crypto.randomUUID(),
       JSON.stringify(logEntry)
     );
 
-    // Redirect user
+    // Redirect
     return Response.redirect(links[slug].destination, 302);
   }
 };
